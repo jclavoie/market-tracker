@@ -1,39 +1,45 @@
-const STOCK_SYMBOLS = (process.env.STOCK_SYMBOLS || "AAPL,GOOGL,MSFT,AMZN").split(",").map(s => s.trim());
-const YAHOO_QUOTE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/";
+const YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/";
 
-async function fetchStockData() {
+async function fetchStockData(symbols, fromDate, toDate) {
+  const from = Math.floor(new Date(fromDate + "T00:00:00Z").getTime() / 1000);
+  const to = Math.floor(new Date(toDate + "T23:59:59Z").getTime() / 1000);
+
   const results = await Promise.allSettled(
-    STOCK_SYMBOLS.map(async (symbol) => {
-      const url = `${YAHOO_QUOTE_URL}${symbol}?range=1d&interval=1d`;
+    symbols.map(async (symbol) => {
+      const url = `${YAHOO_CHART_URL}${encodeURIComponent(symbol)}?period1=${from}&period2=${to}&interval=1d`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status} for ${symbol}`);
       const json = await res.json();
       const result = json.chart?.result?.[0];
       if (!result) throw new Error(`No chart data for ${symbol}`);
 
-      const quote = result.indicators.quote?.[0];
+      const timestamps = result.timestamp || [];
+      const quote = result.indicators?.quote?.[0];
       const meta = result.meta;
-      const open = quote.open?.[0] ?? meta.chartPreviousClose ?? meta.regularMarketPrice;
-      const close = meta.regularMarketPrice ?? quote.close?.[0];
-      const change = close - open;
-      const changePercent = open !== 0 ? (change / open) * 100 : 0;
+
+      const data = timestamps.map((ts, i) => ({
+        date: new Date(ts * 1000).toISOString().slice(0, 10),
+        open: quote?.open?.[i] != null ? +quote.open[i].toFixed(2) : null,
+        high: quote?.high?.[i] != null ? +quote.high[i].toFixed(2) : null,
+        low: quote?.low?.[i] != null ? +quote.low[i].toFixed(2) : null,
+        close: quote?.close?.[i] != null ? +quote.close[i].toFixed(2) : null,
+      }));
 
       return {
         symbol,
-        open: +open.toFixed(2),
-        close: +close.toFixed(2),
-        change: +change.toFixed(2),
-        changePercent: +changePercent.toFixed(2),
+        name: meta?.shortName || meta?.longname || symbol,
+        data,
       };
     })
   );
 
-  const data = [];
+  const stocks = {};
   const errors = [];
 
   for (const r of results) {
     if (r.status === "fulfilled") {
-      data.push(r.value);
+      const { symbol, name, data } = r.value;
+      stocks[symbol] = { name, data };
     } else {
       errors.push(r.reason.message);
     }
@@ -43,7 +49,7 @@ async function fetchStockData() {
     console.error("Stock fetch errors:", errors.join("; "));
   }
 
-  return data;
+  return stocks;
 }
 
 module.exports = { fetchStockData };
