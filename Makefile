@@ -14,7 +14,7 @@ help:
 build:
 	docker build -t $(IMAGE) .
 
-run:
+run: stop
 	docker run -d --name $(CONTAINER) -p $(PORT):$(PORT) $(IMAGE)
 	@echo "Running at http://localhost:$(PORT)"
 

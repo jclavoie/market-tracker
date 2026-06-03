@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Market Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 960px; margin: 0 auto; padding: 1em; color: #111; }
+    h1 { font-size: 1.4em; margin-bottom: 0.5em; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 0.75em; align-items: center; margin-bottom: 1em; }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap input { width: 100%; padding: 0.5em 0.75em; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95em; }
+    .dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 6px 6px; max-height: 240px; overflow-y: auto; z-index: 10; display: none; }
+    .dropdown.visible { display: block; }
+    .dd-item { padding: 0.5em 0.75em; cursor: pointer; display: flex; justify-content: space-between; }
+    .dd-item:hover { background: #f0f0f0; }
+    .dd-item .sym { font-weight: 600; }
+    .dd-item .exch { color: #888; font-size: 0.85em; }
+    .dd-empty { padding: 0.5em 0.75em; color: #888; }
+
+    .date-controls { display: flex; gap: 0.5em; align-items: center; }
+    .date-controls label { font-size: 0.9em; }
+    .date-controls input { padding: 0.4em 0.5em; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9em; }
+
+    .pills { display: flex; flex-wrap: wrap; gap: 0.4em; margin-bottom: 1em; }
+    .pill { display: inline-flex; align-items: center; gap: 0.3em; background: #e8f0fe; color: #1a73e8; border-radius: 20px; padding: 0.3em 0.7em; font-size: 0.85em; font-weight: 500; }
+    .pill .remove { cursor: pointer; font-weight: 700; font-size: 1.1em; line-height: 1; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1.5em; }
+    th, td { padding: 0.5em 0.75em; text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { border-bottom: 2px solid #ccc; font-size: 0.85em; text-transform: uppercase; color: #555; }
+    td { border-bottom: 1px solid #eee; }
+    tr:hover { background: #f9f9f9; }
+    .empty { text-align: center; color: #888; padding: 2em 0; }
+
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+    @media (max-width: 640px) { .charts { grid-template-columns: 1fr; } }
+    .chart-box { position: relative; }
+    .chart-box canvas { width: 100% !important; max-height: 300px; }
+  </style>
+</head>
+<body>
+  <h1>Stock Daily Movement</h1>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="Search stocks..." autocomplete="off">
+      <div class="dropdown" id="dropdown"></div>
+    </div>
+    <div class="date-controls">
+      <label for="from">From</label>
+      <input type="date" id="from">
+      <label for="to">To</label>
+      <input type="date" id="to">
+    </div>
+  </div>
+
+  <div class="pills" id="pills"></div>
+
+  <div id="table-container"></div>
+
+  <div class="charts">
+    <div class="chart-box"><canvas id="line-chart"></canvas></div>
+    <div class="chart-box"><canvas id="bar-chart"></canvas></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
