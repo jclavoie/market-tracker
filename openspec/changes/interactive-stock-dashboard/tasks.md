@@ -8,9 +8,9 @@
 
 ## Firewall 2 — Client Agent
 
-- [ ] 2.1 Remove `src/dashboard.js` (replaced by client rendering)
-- [ ] 2.2 Create `src/public/index.html` — HTML shell with Chart.js CDN `<script>`, search input, date pickers, symbol pills container, table, two `<canvas>` elements, load `app.js`
-- [ ] 2.3 Create `src/public/app.js` — state object with URL+localStorage sync, search autocomplete, symbol pills, data fetch, table rendering, line+bar charts via Chart.js, empty states
+- [x] 2.1 Remove `src/dashboard.js` (replaced by client rendering)
+- [x] 2.2 Create `src/public/index.html` — HTML shell with Chart.js CDN `<script>`, search input, date pickers, symbol pills container, table, two `<canvas>` elements, load `app.js`
+- [x] 2.3 Create `src/public/app.js` — state object with URL+localStorage sync, search autocomplete, symbol pills, data fetch, table rendering, line+bar charts via Chart.js, empty states
 
 <!-- commit firewall -->
 
